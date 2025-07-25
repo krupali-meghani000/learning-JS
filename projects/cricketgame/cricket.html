@@ -2,98 +2,125 @@
 <html lang="en">
 <head>
   <title>Cricket Game</title>
-  <style>
-    body{
-      text-align: center;
-    }
-  </style>
+  <link rel="stylesheet" href="cricket.css">
 </head>
 <body>
   <h1>Bat Ball Stump Game</h1>
-  <button onclick="
-  const userchoiceMsg = 'You have chosen Bat';
-  let randomNumber = Math.random() * 3;
-  let computerChoice;
-  if (randomNumber > 0 && randomNumber <= 1 ) {
-    computerChoice = 'Bat';
-   // console.log('computer choice is Bat');
-  }else if (randomNumber > 1 && randomNumber <= 2)
-  {
-   computerChoice = 'Ball';
-   // console.log('computer choice is Ball');
-  }else {
-    computerChoice = 'Stump'
-   // console.log('computer choice is Stunp');
-  }
 
-  let resultMsg;
-  if (computerChoice === 'Ball') {
-    resultMsg = 'User won.'
-  }else if(computerChoice === 'Bat') {
-     resultMsg = `It's a tie`;
-  }else if (computerChoice === 'Stump') {
-   resultMsg = 'Computer has won';
-  }
-  
-  alert(`You have chosen Bat. computer choice is ${computerChoice} and ${resultMsg}`);
-  
-  ">Bat</button>
+  <button class="choice-button" onclick="
+  let computerChoice = generateComputerChoice();
+  let resultMsg = getResult('Bat', computerChoice);
+  showResult('Bat', computerChoice, resultMsg);
+  ">
+    <img src="image/bat.png" alt="Bat Image" class="choice-image">  
+  </button>
 
-  <button  onclick="
-   randomNumber = Math.random() * 3;
-  if (randomNumber > 0 && randomNumber <= 1 ) {
-    computerChoice = 'Bat';
-   // console.log('computer choice is Bat');
-  }else if (randomNumber > 1 && randomNumber <= 2)
-  {
-   computerChoice = 'Ball';
-   // console.log('computer choice is Ball');
-  }else {
-    computerChoice = 'Stump'
-   // console.log('computer choice is Stunp');
-  }
+  <button class="choice-button" onclick="
+    computerChoice = generateComputerChoice();
+    resultMsg = getResult('Ball', computerChoice);
+    showResult('Ball', computerChoice, resultMsg);
+  ">
+    <img src="image/ball.png" alt="Ball Image" class="choice-image">  
+  </button>
 
-  
-  if (computerChoice === 'Ball') {
-    resultMsg = `It's a tie`;
-  }else if(computerChoice === 'Bat') {
-     resultMsg = 'Computer has won';
-  }else if (computerChoice === 'Stump') { 
-   resultMsg = 'User won.';
-  }
-  
-  alert(`You have chosen Ball. computer choice is ${computerChoice} and ${resultMsg}`); 
-  
-  
-  ">Ball</button>
+  <button class="choice-button" onclick="
+    computerChoice = generateComputerChoice();
+    resultMsg = getResult('Stump', computerChoice);
+    showResult('Stump', computerChoice, resultMsg);
+  ">
+    <img src="image/stump.png" alt="Stump Image" class="choice-image">
+  </button>
 
+  <h3 id="user-move"></h3>
+  <h3 id="computer-move"></h3>
+  <h3 id="result"></h3>
+  <h3 id="score"></h3>
 
-  <button onclick="
-   randomNumber = Math.random() * 3;
-  if (randomNumber > 0 && randomNumber <= 1 ) {
-    computerChoice = 'Bat';
-   // console.log('computer choice is Bat');
-  }else if (randomNumber > 1 && randomNumber <= 2)
-  {
-   computerChoice = 'Ball';
-   // console.log('computer choice is Ball');
-  }else {
-    computerChoice = 'Stump'
-   // console.log('computer choice is Stunp');
-  }
+  <button onclick="localStorage.clear()
+      resetScore();
+  ">Reset</button>
 
-  
-  if (computerChoice === 'Stump') {
-    resultMsg = 'Computer has won';
-  }else if(computerChoice === 'Bat') {
-     resultMsg = 'User won.';
-  }else if (computerChoice === 'Stump') { 
-   resultMsg = `It's a tie`;
-  }
-  
-  alert(`You have chosen Stump. computer choice is ${computerChoice} and ${resultMsg}`); 
-  
-  
-  ">Stump</button>
+  <script>
+    let scoreStr = localStorage.getItem('Score');
+    let score;
+    resetScore(scoreStr);
+
+    function resetScore(scoreStr) {
+      score = scoreStr ? JSON.parse(scoreStr) : {
+        win: 0,
+        lost: 0,
+        tie: 0,
+      };
+
+      score.displayScore = function() {
+        return `Score:Won:${score.win}, Lost:${score.lost}, Tie: ${score.tie}`;
+      };
+
+      showResult();
+    }
+
+    function generateComputerChoice() {
+      //This will generate random number between 0 and 3
+      let randomNumber = Math.random() * 3;
+      if (randomNumber > 0 && randomNumber <= 1) {
+        return 'Bat';
+      } else if (randomNumber > 1 && randomNumber <= 2) {
+        return 'Ball';
+      } else {
+        return 'Stump'
+      }
+    }
+
+    function getResult(userMove, computerMove) {
+      if (userMove === 'Bat') {
+        if (computerMove === 'Ball') {
+          score.win++;
+          return 'User won.';
+        } else if (computerMove === 'Bat') {
+          score.tie++;
+          return `It's a tie`;
+        } else if (computerMove === 'Stump') {
+          score.lost++;
+          return 'Computer has won';
+        }
+      } else if (userMove === 'Ball') {
+        if (computerMove === 'Ball') {
+          score.tie++;
+          return `It's a tie`;
+        } else if (computerMove === 'Bat') {
+          score.lost++;
+          return 'Computer has won';
+        } else if (computerMove === 'Stump') {
+          score.win++;
+          return 'User won.';
+        }
+      } else {
+        if (computerMove === 'Ball') {
+          score.lost++;
+          return 'Computer has won';
+        } else if (computerMove === 'Bat') {
+          score.win++;
+          return 'User won.';
+        } else if (computerMove === 'Stump') {
+          score.tie++;
+          return `It's a tie`;
+        }
+      }
+    }
+
+    function showResult(userMove, computerMove, result) {
+      localStorage.setItem('Score', JSON.stringify(score));
+      
+      document.querySelector('#user-move').innerText = 
+        userMove ? `You have chosen ${userMove}` : '';
+      
+      document.querySelector('#computer-move').innerText =
+        computerMove ? `Computer choice is ${computerMove}` : '';
+      
+      document.querySelector('#result').innerText = result || '';
+
+      document.querySelector('#score').innerText = score.displayScore();
+    }
+  </script>
 </body>
 </html>
